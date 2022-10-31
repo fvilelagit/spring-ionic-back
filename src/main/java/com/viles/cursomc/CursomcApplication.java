@@ -1,5 +1,6 @@
 package com.viles.cursomc;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,11 +10,22 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import com.viles.cursomc.domain.Categoria;
 import com.viles.cursomc.domain.Cidade;
+import com.viles.cursomc.domain.Cliente;
+import com.viles.cursomc.domain.Endereco;
 import com.viles.cursomc.domain.Estado;
+import com.viles.cursomc.domain.Pagamento;
+import com.viles.cursomc.domain.PagamentoComBoleto;
+import com.viles.cursomc.domain.PagamentoComCartao;
+import com.viles.cursomc.domain.Pedido;
 import com.viles.cursomc.domain.Produto;
+import com.viles.cursomc.domain.enums.EstadoPagamento;
+import com.viles.cursomc.domain.enums.TipoCliente;
 import com.viles.cursomc.repositories.CategoriaRepository;
 import com.viles.cursomc.repositories.CidadeRepository;
+import com.viles.cursomc.repositories.ClienteRepository;
+import com.viles.cursomc.repositories.EnderecoRepository;
 import com.viles.cursomc.repositories.EstadoRepository;
+import com.viles.cursomc.repositories.PedidoRepository;
 import com.viles.cursomc.repositories.ProdutoRepository;
 
 @SpringBootApplication
@@ -30,6 +42,17 @@ public class CursomcApplication implements CommandLineRunner {
 	
 	@Autowired
 	CidadeRepository cidadeRepository;
+	
+	@Autowired
+	ClienteRepository clienteRepository;
+	
+	@Autowired
+	EnderecoRepository enderecoRepository;
+	
+	@Autowired
+	PedidoRepository pedidoRepository;
+	
+	
 	
 	
 	public static void main(String[] args) {
@@ -50,7 +73,6 @@ public class CursomcApplication implements CommandLineRunner {
 		categoriaRepository.saveAll(Arrays.asList(cat1,cat2));
 		produtoRepository.flush();
 		categoriaRepository.flush();
-		
 		
 		cat1.getProdutos().addAll(Arrays.asList(p1,p2,p3));
 		cat2.getProdutos().add(p2); 
@@ -79,7 +101,41 @@ public class CursomcApplication implements CommandLineRunner {
 
 		estadoRepository.saveAll(Arrays.asList(est1,est2));
 		
+		Cliente cli1 = new Cliente (null,"Maria Silva", "maria@gmail.com", "965441325", TipoCliente.PESSOAFISICA);
 		
+		cli1.getTelefones().addAll(Arrays.asList("39354752", "99885566"));
+		clienteRepository.save(cli1);
+		clienteRepository.flush();
+		
+		
+		Endereco e1 = new Endereco(null, "Rua flores", "300", "Apto 302", "jardim", "45889952",cli1, c1);
+		Endereco e2 = new Endereco(null, "Rua Zezito Amarante", "96", "Sem Complemento", "Lot Casa Azul", "84457255",cli1, c2);
+		Endereco ez = new Endereco(null, "Rua flores", "300", "Apto 302", "jardim", "45889952",null, c1);
+		
+		enderecoRepository.save(ez);
+		
+		enderecoRepository.saveAll(Arrays.asList(e1,e2));
+		
+		
+		cli1.getEnderecos().addAll(Arrays.asList(e1,e2));
+		
+		clienteRepository.save(cli1);
+		
+		
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+		
+		Pedido ped1 = new Pedido(null, sdf.parse("30/09/2022 11:40"),cli1,e1);
+		Pedido ped2 = new Pedido(null, sdf.parse("30/09/2022 11:40"),cli1,e1);
+
+		
+		
+		Pagamento pagto1 = new PagamentoComCartao(null,EstadoPagamento.QUITADO,ped1,6);
+		Pagamento pagto2 = new PagamentoComBoleto(null,EstadoPagamento.PENDENTE, ped2,sdf.parse("30/10/2022 00:00"),null);
+		
+		ped1.setPagamento(pagto1);
+		ped2.setPagamento(pagto2);
+		pedidoRepository.save(ped1);
+		pedidoRepository.save(ped2);
 		
 	}
 }

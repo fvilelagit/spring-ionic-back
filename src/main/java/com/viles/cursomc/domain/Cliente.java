@@ -6,13 +6,19 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.CollectionTable;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.viles.cursomc.domain.enums.TipoCliente;
 
+@Entity
 public class Cliente implements Serializable{
 
 
@@ -27,11 +33,18 @@ public class Cliente implements Serializable{
 	private String cpfOuCnpj;
 	private Integer tipo;
 	
-	private Set<String> telefones = new HashSet<>();
+	@ElementCollection //Criar tabela relacional com a string telefone e o id do cliente
+	@CollectionTable(name="TELEFONE") //Nome da tabela 
+	private Set<String> telefones = new HashSet<>(); // "telefones" é o nome da coluna nessa tabela
 	
+	@JsonManagedReference
 	@OneToMany(mappedBy = "cliente")
 	private List<Endereco> enderecos = new ArrayList<>();
 
+	@OneToMany(mappedBy="cliente")
+	private List<Pedido> pedidos = new ArrayList<>();
+	
+	
 	public Cliente() {
 
 	}
