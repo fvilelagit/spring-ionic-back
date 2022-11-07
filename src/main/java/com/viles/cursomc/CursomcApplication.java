@@ -1,6 +1,7 @@
 package com.viles.cursomc;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import com.viles.cursomc.domain.Cidade;
 import com.viles.cursomc.domain.Cliente;
 import com.viles.cursomc.domain.Endereco;
 import com.viles.cursomc.domain.Estado;
+import com.viles.cursomc.domain.ItemPedido;
 import com.viles.cursomc.domain.Pagamento;
 import com.viles.cursomc.domain.PagamentoComBoleto;
 import com.viles.cursomc.domain.PagamentoComCartao;
@@ -25,6 +27,7 @@ import com.viles.cursomc.repositories.CidadeRepository;
 import com.viles.cursomc.repositories.ClienteRepository;
 import com.viles.cursomc.repositories.EnderecoRepository;
 import com.viles.cursomc.repositories.EstadoRepository;
+import com.viles.cursomc.repositories.ItemPedidoRepository;
 import com.viles.cursomc.repositories.PedidoRepository;
 import com.viles.cursomc.repositories.ProdutoRepository;
 
@@ -51,6 +54,9 @@ public class CursomcApplication implements CommandLineRunner {
 	
 	@Autowired
 	PedidoRepository pedidoRepository;
+	
+	@Autowired
+	ItemPedidoRepository itemPedidoRepository;
 	
 	
 	
@@ -136,6 +142,21 @@ public class CursomcApplication implements CommandLineRunner {
 		ped2.setPagamento(pagto2);
 		pedidoRepository.save(ped1);
 		pedidoRepository.save(ped2);
+		
+		ItemPedido ip1 = new ItemPedido(ped1,p1, 0.00,1,2000.00);
+		ItemPedido ip2 = new ItemPedido(ped1,p3, 0.00,2,80.00);
+		ItemPedido ip3 = new ItemPedido(ped2,p2, 100.00,1,800.00);
+		
+		
+		ped1.getItens().addAll(Arrays.asList(ip1,ip2));
+		ped2.getItens().add(ip3);
+		
+		p1.getItens().add(ip1);
+		p2.getItens().add(ip3);
+		p3.getItens().add(ip2);
+		
+		itemPedidoRepository.saveAll(Arrays.asList(ip1,ip2,ip3));
+		
 		
 	}
 }
